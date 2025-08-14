@@ -125,11 +125,7 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
               </td>
               <td className="px-4 py-2 text-center">
                 <button
-                  onClick={() => {
-                    if (window.confirm(`¿Estás seguro de que quieres eliminar a ${player.name}? Esta acción no se puede deshacer.`)) {
-                      onRemovePlayer(player.id);
-                    }
-                  }}
+                  onClick={() => onRemovePlayer(player.id)}
                   className="text-slate-400 hover:text-red-600 transition-colors p-1 rounded-full"
                   aria-label={`Eliminar a ${player.name}`}
                 >
