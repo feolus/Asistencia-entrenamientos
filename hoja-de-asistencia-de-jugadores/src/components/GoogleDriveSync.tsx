@@ -167,13 +167,23 @@ export const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({ appData, onDat
             mimeType: 'application/json',
         };
 
+        let appDataString;
+        try {
+            appDataString = JSON.stringify(appData, null, 2);
+        } catch (e) {
+            console.error("Error serializing application data:", e);
+            setStatusMessage("Error: No se pudieron procesar los datos para guardar. Revisa la consola para más detalles.");
+            setIsLoading(false);
+            return;
+        }
+
         const multipartRequestBody =
             delimiter +
             'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
             JSON.stringify(metadata) +
             delimiter +
             'Content-Type: application/json\r\n\r\n' +
-            JSON.stringify(appData, null, 2) +
+            appDataString +
             close_delim;
 
         const request = gapi.client.request({
