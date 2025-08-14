@@ -139,7 +139,7 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
         })}
          {players.length === 0 && (
             <tr>
-                <td colSpan={trainingDates.length + 7} className="text-center py-12 text-slate-500">
+                <td colSpan={trainingDates.length + 6} className="text-center py-12 text-slate-500">
                     <p className="text-lg">No hay jugadores en la lista.</p>
                     <p>Usa el botón "+ Añadir Jugador" para empezar.</p>
                 </td>
