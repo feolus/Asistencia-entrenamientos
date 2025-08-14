@@ -1,0 +1,5 @@
+{
+  "name": "Hoja de Asistencia de Jugadores",
+  "description": "Una aplicación web interactiva para rastrear la asistencia de los jugadores, inspirada en una hoja de cálculo de Excel. Calcula automáticamente los totales y porcentajes, y utiliza iconos y barras de progreso para una visualización clara.",
+  "requestFramePermissions": []
+}
