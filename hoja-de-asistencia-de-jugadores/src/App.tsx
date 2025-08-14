@@ -34,12 +34,18 @@ const getNextAvailableDate = (dates: string[]): string => {
   return lastDate.toISOString().split('T')[0];
 };
 
+const formatDateForDisplay = (dateString: string) => {
+  const date = new Date(dateString + 'T00:00:00');
+  return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
+
 
 const App: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>(INITIAL_PLAYERS);
   const [trainingDates, setTrainingDates] = useState<string[]>(() => [...INITIAL_TRAINING_DATES].sort());
   const [newTrainingDate, setNewTrainingDate] = useState<string>(() => getNextAvailableDate(trainingDates));
   const [playerToDelete, setPlayerToDelete] = useState<Player | null>(null);
+  const [trainingDateToDelete, setTrainingDateToDelete] = useState<string | null>(null);
 
   const handleDriveDataLoaded = useCallback((data: { players: Player[], trainingDates: string[] }) => {
     if (data.players && Array.isArray(data.players) && data.trainingDates && Array.isArray(data.trainingDates)) {
@@ -128,6 +134,33 @@ const App: React.FC = () => {
       setPlayerToDelete(null);
   }, []);
 
+  const handleRequestRemoveTraining = useCallback((date: string) => {
+    setTrainingDateToDelete(date);
+  }, []);
+
+  const handleCancelRemoveTraining = useCallback(() => {
+    setTrainingDateToDelete(null);
+  }, []);
+
+  const handleConfirmRemoveTraining = useCallback(() => {
+    if (!trainingDateToDelete) return;
+    
+    const dateIndex = trainingDates.indexOf(trainingDateToDelete);
+    if (dateIndex === -1) return;
+
+    // Remove the date from the training dates array
+    setTrainingDates(prevDates => prevDates.filter(d => d !== trainingDateToDelete));
+    
+    // Remove the attendance data for that date from each player
+    setPlayers(prevPlayers => prevPlayers.map(player => {
+        const newAttendance = [...player.attendance];
+        newAttendance.splice(dateIndex, 1);
+        return { ...player, attendance: newAttendance };
+    }));
+    
+    setTrainingDateToDelete(null); // Close the modal
+  }, [trainingDateToDelete, trainingDates]);
+
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
@@ -183,6 +216,7 @@ const App: React.FC = () => {
                 onUpdatePlayerName={handleUpdatePlayerName}
                 onUpdateAttendance={handleUpdateAttendance}
                 onRemovePlayer={handleRequestRemovePlayer}
+                onRemoveTraining={handleRequestRemoveTraining}
               />
             </div>
         </div>
@@ -203,6 +237,33 @@ const App: React.FC = () => {
                         </button>
                         <button
                             onClick={handleConfirmRemovePlayer}
+                            className="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+        )}
+
+        {trainingDateToDelete && (
+             <Modal isOpen={!!trainingDateToDelete} onClose={handleCancelRemoveTraining}>
+                <div className="text-center p-4">
+                    <h3 className="text-xl font-bold text-slate-800">Confirmar Eliminación</h3>
+                    <p className="my-4 text-slate-600">
+                        ¿Estás seguro de que quieres eliminar el entrenamiento del <strong>{formatDateForDisplay(trainingDateToDelete)}</strong>?
+                        <br />
+                        Se borrarán todos los datos de asistencia para esta fecha.
+                    </p>
+                    <div className="flex justify-center gap-4 mt-6">
+                        <button
+                            onClick={handleCancelRemoveTraining}
+                            className="px-6 py-2 bg-slate-200 text-slate-800 font-semibold rounded-lg hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleConfirmRemoveTraining}
                             className="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                         >
                             Eliminar

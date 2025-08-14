@@ -10,6 +10,7 @@ interface AttendanceTableProps {
   onUpdatePlayerName: (playerId: number, newName: string) => void;
   onUpdateAttendance: (playerId: number, dayIndex: number, newStatus: AttendanceStatus | null) => void;
   onRemovePlayer: (playerId: number) => void;
+  onRemoveTraining: (date: string) => void;
 }
 
 const PlayerNameInput: React.FC<{ player: Player; onUpdatePlayerName: (id: number, name: string) => void; }> = ({ player, onUpdatePlayerName }) => {
@@ -45,6 +46,7 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
   onUpdatePlayerName,
   onUpdateAttendance,
   onRemovePlayer,
+  onRemoveTraining,
 }) => {
   const formatDate = (dateString: string) => {
     // Add T00:00:00 to avoid timezone issues where new Date(YYYY-MM-DD) might be interpreted as the previous day
@@ -60,8 +62,17 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
             Nombre del Jugador
           </th>
           {trainingDates.map(date => (
-            <th key={date} scope="col" className="px-3 py-3 text-center text-xs font-bold text-slate-600 uppercase tracking-wider min-w-[90px]">
+            <th key={date} scope="col" className="px-3 py-3 text-center text-xs font-bold text-slate-600 uppercase tracking-wider min-w-[90px] relative group">
               {formatDate(date)}
+              <button 
+                onClick={() => onRemoveTraining(date)}
+                className="absolute top-1/2 right-1 -translate-y-1/2 text-slate-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full"
+                aria-label={`Eliminar entrenamiento del ${formatDate(date)}`}
+              >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
+                  </svg>
+              </button>
             </th>
           ))}
           <th scope="col" className="px-4 py-3 text-center text-xs font-bold text-slate-600 uppercase tracking-wider min-w-[120px]">
@@ -139,7 +150,7 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
         })}
          {players.length === 0 && (
             <tr>
-                <td colSpan={trainingDates.length + 6} className="text-center py-12 text-slate-500">
+                <td colSpan={trainingDates.length + 7} className="text-center py-12 text-slate-500">
                     <p className="text-lg">No hay jugadores en la lista.</p>
                     <p>Usa el botón "+ Añadir Jugador" para empezar.</p>
                 </td>
